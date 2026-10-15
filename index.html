@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lipid - Sinh 10 - Tổ 4</title>
+     <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --primary-color: #eeff00;
+            --bg-color: #0d0d0d;
+            --text-color: #ffffff;
+            --section-bg-1: #0d0d0d;
+            
+            --section-bg-2 : #141414;
+            --section-bg-3: #0a0a0a;
+            --correct-color: #48ff00;
+            --wrong-color: #dc3545;
+            --transition-speed: 0.4s;
+            --font-main: 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
+            --header-height: 80px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Ẩn ngôn ngữ không được chọn */
+        body.lang-vi .en {
+            display: none !important;
+        }
+        body.lang-en .vi {
+            display: none !important;
+        }
+        
+        .en {
+            display: none !important;
+        }
+        body.lang-en .en {
+            display: inline-block !important;
+        }
+        body.lang-en div.en, body.lang-en p.en, body.lang-en h1.en, body.lang-en h2.en, body.lang-en h3.en {
+            display: block !important;
+        }
+
+        /* ==========================================================================
+           2. TYPOGRAPHY & UTILITIES
+           ========================================================================== */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .title-huge { font-size: 4rem; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); color: var(--primary-color); }
+        .title-large { font-size: 2.8rem; color: var(--primary-color); text-shadow: 2px 2px 8px rgba(0,0,0,0.8); }
+        .title-medium { font-size: 2rem; }
+        
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #dddddd;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 35px;
+            background-color: var(--primary-color);
+            color: #000;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background-color: #fff;
+            box-shadow: 0 0 15px var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        /* KHUNG CHÈN ẢNH TỐI ƯU (Đã tăng kích thước và đổi object-fit thành contain cho sơ đồ) */
+        .image-box {
+            width: 100%;
+            min-height: 300px;
+            max-height: 450px;
+            border: 2px dashed #444;
+            background: rgba(255,255,255,0.02);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .image-box::before {
+            content: 'Hình ảnh minh họa';
+            position: absolute;
+            color: #666;
+            font-size: 0.85rem;
+            z-index: 1;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Đổi thành contain để sơ đồ phân tử hiển thị trọn vẹn không bị mất góc */
+            position: relative;
+            z-index: 2;
+            background: #0d0d0d;
+        }
+
+        /* ==========================================================================
+           3. UI NÂNG CAO: FADE & ARROWS & BACKGROUND
+           ========================================================================== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+            will-change: opacity, transform;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .delay-1 { transition-delay: 0.2s; }
+        .delay-2 { transition-delay: 0.4s; }
+        .delay-3 { transition-delay: 0.6s; }
+        .delay-4 { transition-delay: 0.8s; }
+
+        /* Mũi tên chuyển trang */
+        .page-nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(13, 13, 13, 0.8);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 9998;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .page-nav-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 20px var(--primary-color);
+            transform: translateY(-50%) scale(1.1);
+        }
+        #prev-page-btn { left: 20px; }
+        #next-page-btn { right: 20px; }
+
+        /* ẢNH NỀN KÈM LỚP PHỦ ĐEN CHO TẤT CẢ CÁC TRANG */
+        .bg-with-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .bg-with-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4) contrast(1.1); 
+            transform: scale(1.05);
+            animation: bg-zoom 20s infinite alternate ease-in-out;
+        }
+        .bg-with-overlay::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 1;
+        }
+        @keyframes bg-zoom {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
+        }
+
+        /* ==========================================================================
+           4. NAVIGATION BAR & MENU ĐỀ MỤC
+           ========================================================================== */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: rgba(13, 13, 13, 0.95); display: flex; justify-content: space-between;
+            align-items: center; padding: 0 30px; z-index: 9999; border-bottom: 1px solid #222;
+            backdrop-filter: blur(10px);
+        }
+        .nav-logo h2 { margin: 0; font-size: 1.5rem; color: var(--primary-color); cursor: pointer; }
+        
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-menu li a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            text-transform: uppercase;
+        }
+        .nav-menu li a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-controls { display: flex; align-items: center; gap: 15px; }
+        .lang-switch { display: flex; background: #1a1a1a; border-radius: 30px;
+             overflow: hidden; border: 1px solid #333; }
+        .lang-switch button { background: transparent; color: #fff; border: none; 
+            padding: 8px 15px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 0.85rem; }
+        .lang-switch button.active { background: var(--primary-color); color: #000; }
+
+        /* ==========================================================================
+           5. SCROLL LAYOUT & VERTICAL FIX
+           ========================================================================== */
+        .horizontal-scroll-wrapper { height: 500vh; position: relative; width: 100%; }
+        .horizontal-scroll-container { position: sticky; top: 0; height: 100vh;
+             width: 500vw; display: flex; will-change: transform; }
+        
+        .horizontal-page {
+            width: 100vw; height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: calc(var(--header-height) + 10px) 40px 30px 40px;
+            position: relative; text-align: center;
+            background-color: #000;
+        }
+
+        .vertical-page {
+            width: 100%; 
+            min-height: 100vh; 
+            height: auto; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            padding: calc(var(--header-height) + 30px) 20px 50px 20px;
+            position: relative; 
+            text-align: center;
+            background-color: #000;
+        }
+
+        /* ==========================================================================
+           6. PAGE COMPONENTS & HOME MENU GRID
+           ========================================================================== */
+        .hero-content {
+            z-index: 2; padding: 25px; background: rgba(15,15,15,0.85);
+            border-radius: 20px; border: 1px solid #333; max-width: 1000px; width: 100%;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .home-grid-menu {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+            max-height: 45vh;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .home-menu-card {
+            background: #141414;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid #262626;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .home-menu-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(46, 213, 115, 0.2);
+        }
+
+        .home-menu-img {
+            width: 100%;
+            height: 75px;
+            object-fit: cover;
+        }
+
+        .home-menu-title {
+            padding: 6px 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        
+        .split-layout { 
+            display: flex; gap: 30px; max-width: 1100px; width: 100%; align-items: center; text-align: left; margin-top: 20px; 
+            position: relative; z-index: 2;
+        }
+        .split-text { 
+            flex: 1; background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(5px); padding: 25px; 
+            border-radius: 10px; border-left: 5px solid var(--primary-color); border: 1px solid #333; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+        .split-image { flex: 1; position: relative; z-index: 2; }
+
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px;
+             width: 100%; max-width: 1100px; margin-top: 30px; position: relative; z-index: 2; }
+        .card { background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(5px); padding: 25px; 
+            border-radius: 10px; text-align: left; border-top: 5px solid var(--primary-color); border: 1px solid #333;
+             transition: 0.3s; box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .card h3 { color: var(--primary-color); font-size: 1.3rem; }
+
+        .info-box { 
+            background: rgba(20, 20, 20, 0.85); 
+            backdrop-filter: blur(5px);
+            color: #fff; 
+            border: 1px solid #333; 
+            padding: 30px; 
+            max-width: 900px; 
+            width: 100%;
+            border-radius: 10px; 
+            text-align: left; 
+            margin-top: 20px;
+            max-height: 72vh;
+            overflow-y: auto; 
+            position: relative; 
+            z-index: 2;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .info-box::-webkit-scrollbar { width: 6px; }
+        .info-box::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        .info-box p { color: #cccccc; font-size: 1.05rem; }
+        .info-box h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 8px;
+             color: var(--text-color); font-size: 1.5rem; }
+
+        .faq-container { width: 100%; max-width: 800px; margin-top: 20px; text-align: left;
+             max-height: 65vh; overflow-y: auto; padding-right: 5px; position: relative; z-index: 2; }
+        .faq-container::-webkit-scrollbar { width: 6px; }
+        .faq-container::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        
+        .faq-item { background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(5px); 
+            margin-bottom: 12px; border-radius: 5px; overflow: hidden; border: 1px solid #333; }
+        .faq-question { padding: 15px 20px; cursor: pointer; font-weight: bold; font-size: 1.1rem; 
+            display: flex; justify-content: space-between; background: rgba(26, 26, 26, 0.9); transition: 0.3s; }
+        .faq-question:hover { color: var(--primary-color); }
+        .faq-answer { padding: 0 20px; max-height: 0; overflow: hidden; transition: 
+            max-height 0.3s ease; background: rgba(20, 20, 20, 0.85); }
+        .faq-answer p { margin: 15px 0; }
+
+        /* ==========================================================================
+           7. QUIZ MODAL
+           ========================================================================== */
+        #quiz-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(10, 10, 10, 0.95); z-index: 10000; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        .close-quiz { position: absolute; top: 30px; right: 40px; font-size: 3rem; color:
+             #fff; cursor: pointer; z-index: 10; }
+        .close-quiz:hover { color: var(--wrong-color); }
+        
+        .quiz-container { width: 90%; max-width: 900px; text-align: center; position: relative; z-index: 2; }
+        .question-text { font-size: 2.2rem; margin-bottom: 40px; color: var(--primary-color); 
+            min-height: 80px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; position: relative; min-height: 250px; }
+        .option-item {
+            background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(5px); border: 3px
+             solid #333; padding: 20px; font-size: 1.2rem;
+            font-weight: bold; border-radius: 12px; cursor: pointer; transition: all 0.4s ease;
+            display: flex; justify-content: center; align-items: center; color: #fff; user-select: none;
+        }
+        .option-item:hover { background: rgba(31, 31, 31, 0.95); border-color: var(--primary-color); transform: translateY(-3px); }
+
+        .option-item.hidden { opacity: 0; visibility: hidden; pointer-events: none; transform: scale(0.5); }
+        .option-item.correct-zoom {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.4);
+            background-color: var(--correct-color) !important; border-color: var(--correct-color) !important;
+            color: white; z-index: 100; width: 80%; pointer-events: none; box-shadow: 0 0 40px rgba(40, 167, 69, 0.6);
+        }
+        .option-item.wrong-static { background-color: var(--wrong-color) !important; 
+            border-color: var(--wrong-color) !important; color: white; pointer-events: none; animation: shake 0.5s; }
+        .option-item.correct-static { background-color: var(--correct-color) !important; 
+            border-color: var(--correct-color) !important; color: white; pointer-events: none; }
+
+        .next-arrow-btn {
+            display: none; margin-top: 40px; background: none; border: none;
+            color: var(--primary-color); cursor: pointer; font-size: 4rem; animation: pulse-arrow 1.5s infinite;
+        }
+        #quiz-result-screen { display: none; text-align: center; }
+        .score-display { font-size: 5rem; color: var(--primary-color); margin: 20px 0; text-shadow: 0 0 20px rgba(46, 213, 115, 0.5); }
+
+        @keyframes pulse-arrow { 0%, 100% { transform: translateX(0) scale(1); } 50% { 
+            transform: translateX(15px) scale(1.1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25%, 75% {
+             transform: translateX(-8px); } 50% { transform: translateX(8px); } }
+
+        /* ==========================================================================
+           8. GRID DESTINATIONS & ANIMATIONS
+           ========================================================================== */
+        .grid-destinations {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            padding: 10px 0;
+            width: 95%y;
+        }
+
+        .dest-card {
+            flex: 1;
+            height: 450px;
+            width: 270px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transition: transform 0.4s ease;
+            opacity: 0;
+            border: 1px solid #333;
+        }
+
+        .dest-card.swivel-active {
+            animation: swivelIn 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        .dest-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .dest-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .dest-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 60%;
+            background: linear-gradient(to top, rgba(13,13,13,0.95) 10%, rgba(13,13,13,0));
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            color: #fff;
+            text-align: left;
+        }
+
+        .dest-overlay h3.vi, .dest-overlay h3.en {
+            font-size: 1.15rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .dest-overlay p {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        @keyframes swivelIn {
+            0% { transform: perspective(800px) rotateY(90deg); opacity: 0; }
+            100% { transform: perspective(800px) rotateY(0deg); opacity: 1; }
+        }
+
+        @keyframes detailFadeUp {
+            0% { transform: translateY(40px) scale(0.95); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes detailFadeDown {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(40px) scale(0.95); opacity: 0; }
+        }
+
+        .detail-fade-up { animation: detailFadeUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .detail-fade-down { animation: detailFadeDown 0.25s ease forwards; }
+
+        #detail-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(10, 10, 10, 0.9);
+            z-index: 10005;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .detail-modal-box {
+            background: #141414;
+            border: 2px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            text-align: left;
+            box-shadow: 0 0 30px rgba(46, 213, 115, 0.2);
+        }
+
+        .close-detail {
+            position: absolute;
+            top: 15px; right: 25px;
+            font-size: 2.2rem;
+            color: #fff;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .close-detail:hover { color: var(--wrong-color); }
+
+        .detail-modal-box h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .detail-modal-box p {
+            color: #ddd;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-top: 10px;
+            white-space: pre-line;
+            max-width: 100%;
+            text-align: left;
+        }
+
+        @media screen and (max-width: 1100px) {
+            .nav-menu { display: none; }
+            .home-grid-menu { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media screen and (max-width: 900px) {
+            .split-layout { flex-direction: column; }
+            .grid-container { grid-template-columns: repeat(2, 1fr); }
+            .grid-destinations { flex-direction: column; }
+            .dest-card { width: 100%; height: 320px; }
+            .title-huge { font-size: 2.2rem; }
+            .page-nav-btn { width: 40px; height: 40px; font-size: 1.2rem; }
+        }
+        @media screen and (max-width: 600px) {
+            .grid-container { grid-template-columns: 1fr; }
+            .options-grid { grid-template-columns: 1fr; }
+            .home-grid-menu { grid-template-columns: 1fr; max-height: 40vh; }
+        }
+    </style>
+</head>
+<body class="lang-vi">
+
+    <!-- NAVIGATION HEADER & MENU ĐỀ MỤC -->
+    <nav class="navbar">
+        <div class="nav-logo" onclick="goToSection(0)">
+            <h2 class="vi">BIO-LIPID</h2>
+            <h2 class="en">BIO-LIPID</h2>
+        </div>
+
+        <ul class="nav-menu">
+            <li><a href="#" onclick="goToSection(0); return false;"><span class="vi">Trang chủ</span><span class="en">Home</span></a></li>
+            <li><a href="#" onclick="goToSection(1); return false;"><span class="vi">Khái niệm</span><span class="en">Concept</span></a></li>
+            <li><a href="#" onclick="goToSection(2); return false;"><span class="vi">Cấu tạo</span><span class="en">Structure</span></a></li>
+            <li><a href="#" onclick="goToSection(3); return false;"><span class="vi">Phân loại</span><span class="en">Types</span></a></li>
+            <li><a href="#" onclick="goToSection(4); return false;"><span class="vi">Vai trò</span><span class="en">Roles</span></a></li>
+            <li><a href="#" onclick="goToSection(5); return false;"><span class="vi">Mỡ & Dầu</span><span class="en">Fats/Oils</span></a></li>
+            <li><a href="#" onclick="goToSection(6); return false;"><span class="vi">Câu hỏi thường gặp</span><span class="en">FAQ</span></a></li>
+            <li><a href="#" onclick="goToSection(7); return false;"><span class="vi">Sự thật</span><span class="en">Facts</span></a></li>
+            <li><a href="#" onclick="goToSection(8); return false;"><span class="vi">Quiz</span><span class="en">Quiz</span></a></li>
+        </ul>
+
+        <div class="nav-controls">
+            <div class="lang-switch">
+                <button id="btn-vi" class="active" onclick="switchLanguage('vi')">VIE</button>
+                <button id="btn-en" onclick="switchLanguage('en')">ENG</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MŨI TÊN CHUYỂN TRANG -->
+    <button class="page-nav-btn" id="prev-page-btn" onclick="navigatePage(-1)">&#10094;</button>
+    <button class="page-nav-btn" id="next-page-btn" onclick="navigatePage(1)">&#10095;</button>
+
+    <!-- PHẦN 1: SCROLL NGANG -->
+    <div class="horizontal-scroll-wrapper" id="horizontal-wrapper">
+        <div class="horizontal-scroll-container" id="horizontal-container">
+            
+            <!-- ====== TRANG CHỦ (HOME / TRANG BÌA) ====== -->
+            <section class="horizontal-page" id="page-home">
+                <div class="bg-with-overlay">
+                    <img src="https://tse2.mm.bing.net/th/id/OIP._0b0dhPycrovewd_1zQSawHaEK?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Ảnh nền trang chủ">
+                </div>
+                
+                <div class="hero-content fade-in">
+                    <h1 class="title-huge vi" style="margin-bottom: 5px;">LIPID - Chất Béo</h1>
+                    <h1 class="title-huge en" style="margin-bottom: 5px;">LIPIDS - FATS</h1>
+                    <p class="vi" style="font-size: 0.95rem; margin-bottom: 10px;">Sinh học 10 - Bài 5: Các phân tử sinh học</p>
+                    <p class="en" style="font-size: 0.95rem; margin-bottom: 10px;">Biology 10 - Lesson 5: Biological Molecules</p>
+                    
+                    <div class="home-grid-menu">
+                        <div class="home-menu-card" onclick="goToSection(1)">
+                            <img class="home-menu-img" src="https://nutrihome.vn/wp-content/uploads/2024/04/lipid-co-trong-thuc-pham-nao-01.jpg" alt="Khái niệm">
+                            <div class="home-menu-title"><span class="vi">1. Khái niệm</span><span class="en">1. Concept</span></div>
+                        </div>
+                        <div class="home-menu-card" onclick="goToSection(2)">
+                            <img class="home-menu-img" src="https://video.vietjack.com/upload2/quiz_source1/2022/06/55-1654417013.png" alt="Cấu tạo">
+                            <div class="home-menu-title"><span class="vi">2. Cấu tạo</span><span class="en">2. Structure</span></div>
+                        </div>
+                        <div class="home-menu-card" onclick="goToSection(3)">
+                            <img class="home-menu-img" src="https://cdnmedia.eurofins.com/eurofins-us/media/12159146/carotenoids.png?width=428&height=305&mode=max" alt="Phân loại">
+                            <div class="home-menu-title"><span class="vi">3. Phân loại</span><span class="en">3. Types</span></div>
+                        </div>
+                        <div class="home-menu-card" onclick="goToSection(4)">
+                            <img class="home-menu-img" src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=400" alt="Vai trò">
+                            <div class="home-menu-title"><span class="vi">4. Vai trò</span><span class="en">4. Roles</span></div>
+                        </div>
+                        <div class="home-menu-card" onclick="goToSection(5)">
+                            <img class="home-menu-img" src="https://tse4.mm.bing.net/th/id/OIP.t0cst_zNba-Rof1ZmYG3AQHaEL?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Mỡ & Dầu">
+                            <div class="home-menu-title"><span class="vi">5. Mỡ & Dầu</span><span class="en">5. Fats & Oils</span></div>
+                        </div>
+                        <div class="home-menu-card" onclick="goToSection(6)">
+                            <img class="home-menu-img" src="https://media.istockphoto.com/id/1305761058/photo/big-white-question-mark-on-a-background-of-black-signs-top-view-faq-concept.jpg?s=170667a&w=0&k=20&c=T6keEz6Svzl3IzEcStPEeOJ95-XiF_RR-q9F3ZCrhFc=" alt="Một số câu hỏi">
+                            <div class="home-menu-title"><span class="vi">6. Một số câu hỏi</span><span class="en">6. Sample Questions</span></div>
+                        </div>
+                        <div class="home-menu-card" onclick="goToSection(7)">
+                            <img class="home-menu-img" src="https://tse4.mm.bing.net/th/id/OIP.6fisANKQqvoX5cZptg98UwHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Sự thật">
+                            <div class="home-menu-title"><span class="vi">7. Sự thật</span><span class="en">7. Facts</span></div>
+                        </div>
+                        <div class="home-menu-card" onclick="goToSection(8)">
+                            <img class="home-menu-img" src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=400" alt="Quiz">
+                            <div class="home-menu-title"><span class="vi">8. Quiz</span><span class="en">8. Quiz</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== TRANG 1: KHÁI NIỆM ====== -->
+            <section class="horizontal-page" id="page-2">
+                <div class="bg-with-overlay">
+                    <img src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=1200" alt="Nền khái niệm">
+                </div>
+
+                <h2 class="title-large vi fade-in">KHÁI NIỆM LIPID - CHẤT BÉO</h2>
+                <h2 class="title-large en fade-in">GENERAL STRUCTURE OF LIPIDS - FATS</h2>
+                
+                <div class="split-layout">
+                    <div class="split-text fade-in delay-1">
+                        <h3 class="vi">LIPID</h3>
+                        <h3 class="en">LIPIDS</h3>
+                        <p class="vi">Trong sinh học, lipid là một nhóm các hợp chất hữu cơ có tính chất không tan trong nước nhưng tan trong các dung môi hữu cơ (như xăng, Chloroform).</p>
+                        <p class="en">In biology, lipids are a group of organic compounds that are insoluble in water but soluble in organic solvents (like gasoline, chloroform).</p>
+                        <br>
+                        <h3 class="vi">Chất béo</h3>
+                        <h3 class="en">Fats</h3>
+                        <p class="vi">Là <strong>Triester</strong> của <strong>Glycerol</strong> liên kết với 3 phân tử <strong>Acid béo</strong> thông qua liên kết Ester, gọi chung là <strong>triglyceride</strong>.</p>
+                        <p class="en">It's a <strong>Triester</strong> of <strong>Glycerol</strong> bonded to 3 molecules of <strong>Fatty acids</strong> via Ester linkages, called <strong>triglycerides</strong>.</p>
+                    </div>
+                    
+                    <div class="split-image fade-in delay-2">
+                        <div class="image-box" style="height: 420px;">
+                            <img src="https://biologynotesonline.com/wp-content/uploads/2024/03/Lipids-Definition-Structure-Properties-types-Examples-and-Functions-2048x1152.jpg" alt="Sơ đồ phân loại lipid">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== TRANG 2: CẤU TẠO ====== -->
+            <section class="horizontal-page" id="page-2">
+                <div class="bg-with-overlay">
+                    <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=1200" alt="Nền cấu tạo">
+                </div>
+
+                <h2 class="title-large vi fade-in">CẤU TẠO CHUNG CỦA LIPID</h2>
+                <h2 class="title-large en fade-in">GENERAL STRUCTURE OF LIPIDS</h2>
+                
+                <div class="split-layout">
+                    <div class="split-text fade-in delay-1">
+                        <h3 class="vi">Thành phần hóa học</h3>
+                        <h3 class="en">Chemical Composition</h3>
+                        <p class="vi">Khác với Carbohydrate, Lipid không có cấu trúc đa phân tử. Chúng thường được cấu tạo từ 3 nguyên tố chính là Carbon (C), Hydrogen (H) và Oxygen (O), nhưng tỉ lệ Oxygen ít hơn rất nhiều.</p>
+                        <p class="en">Unlike Carbohydrates, Lipids do not form polymers. They are mainly composed of Carbon (C), Hydrogen (H), and Oxygen (O), but the ratio of Oxygen is much lower.</p>
+                        <br>
+                        <h3 class="vi">Chất béo</h3>
+                        <h3 class="en">Fats</h3>
+                        <p class="vi">Chất béo là dạng phổ biến của lipid, được cấu tạo từ 1 phân tử glycerol liên kết với 3 phân tử Acid béo thông qua liên kết ester.<br>Chất béo thường có công thức chung là (R-COOH)<sub>3</sub>C<sub>3</sub>H<sub>5</sub>, trong đó R là các gốc acid béo (như C<sub>12</sub>H<sub>25</sub>)</p>
+                        <p class="en">Fats are the most common form of lipids, composed of one molecule of glycerol bonded to three molecules of fatty acids through ester linkages.<br>Simple fats typically have the general formula (R-COOH)<sub>3</sub>C<sub>3</sub>H<sub>5</sub>, where R represents various fatty acid chains.</p>
+                    </div>
+                    
+                    <div class="split-image fade-in delay-2">
+                        <div class="image-box" style="height: 420px;">
+                            <img src="https://nutrihome.vn/wp-content/uploads/2024/04/vai-tro-cua-lipid-doi-voi-co-the.jpg" alt="Cấu tạo Glycerol và Triglyceride">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== TRANG 3: PHÂN LOẠI & VÍ DỤ ====== -->
+            <section class="horizontal-page" id="page-3" style="padding: 70px 5%;">
+                <div class="bg-with-overlay">
+                    <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1200" alt="Nền phân loại">
+                </div>
+
+                <h2 class="title-large vi fade-in">PHÂN LOẠI LIPID</h2>
+                <h2 class="title-large en fade-in">CLASSIFICATION OF LIPIDS</h2>
+                <div class="grid-destinations">
+                    <div class="dest-card swivel-card" style="animation-delay: 0.1s;" onclick="openDetail('fats')">
+                        <img src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=800" alt="Mỡ và Dầu">
+                        <div class="dest-overlay">
+                            <h3 class="vi">Mỡ và Dầu</h3>
+                            <h3 class="en">Fats & Oils</h3>
+                            <p class="vi">Xem chi tiết →</p>
+                            <p class="en">View details →</p>
+                        </div>
+                    </div>
+
+                    <div class="dest-card swivel-card" style="animation-delay: 0.3s;" onclick="openDetail('phospholipid')">
+                        <img src="https://i.pinimg.com/originals/56/19/cd/5619cd2057756f140de3c52094f157c2.jpg" alt="Phospholipid">
+                        <div class="dest-overlay">
+                            <h3 class="vi">Phospholipid</h3>
+                            <h3 class="en">Phospholipids</h3>
+                            <p class="vi">Xem chi tiết →</p>
+                            <p class="en">View details →</p>
+                        </div>
+                    </div>
+
+                    <div class="dest-card swivel-card" style="animation-delay: 0.5s;" onclick="openDetail('steroid')">
+                        <img src="https://tse1.mm.bing.net/th/id/OIP.Ac5885cFrMPvllFnKU4ohwAAAA?r=0&w=416&h=416&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Steroid">
+                        <div class="dest-overlay">
+                            <h3 class="vi">Steroid</h3>
+                            <h3 class="en">Steroids</h3>
+                            <p class="vi">Xem chi tiết →</p>
+                            <p class="en">View details →</p>
+                        </div>
+                    </div>
+                    <div class="dest-card swivel-card" style="animation-delay: 0.5s;" onclick="openDetail('carotenoid')">
+                        <img src="https://i.pinimg.com/736x/eb/02/e1/eb02e1d6ebba98c051b2079d99b7ca86.jpg" alt="Carotenoid">
+                        <div class="dest-overlay">
+                            <h3 class="vi">Carotenoid</h3>
+                            <h3 class="en">Carotenoids</h3>
+                            <p class="vi">Xem chi tiết →</p>
+                            <p class="en">View details →</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ====== TRANG 4: VAI TRÒ CỦA LIPID ====== -->
+            <section class="horizontal-page" id="page-4" style="padding: 70px 5%;">
+                <div class="bg-with-overlay">
+                    <img src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?q=80&w=1200" alt="Nền vai trò">
+                </div>
+
+                <h2 class="title-large vi fade-in">VAI TRÒ CỦA LIPID</h2>
+                <h2 class="title-large en fade-in">ROLES OF LIPIDS</h2>
+                <div class="grid-destinations">
+                    <div class="dest-card swivel-card" style="animation-delay: 0.1s;" onclick="openDetail('energy')">
+                        <img src="https://toplist.vn/images/800px/gioi-thieu-ve-gau-trang-bac-cuc-873268.jpg" alt="Dự trữ năng lượng">
+                        <div class="dest-overlay">
+                            <h3 class="vi">Dự trữ năng lượng</h3>
+                            <h3 class="en">Energy Storage</h3>
+                            <p class="vi">Xem chi tiết →</p>
+                            <p class="en">View details →</p>
+                        </div>
+                    </div>
+
+                    <div class="dest-card swivel-card" style="animation-delay: 0.3s;" onclick="openDetail('membrane')">
+                        <img src="https://th.bing.com/th/id/R.018c0f07730e97659c3a31cf36396b33?rik=cxYIReSHHvizRg&pid=ImgRaw&r=0" alt="Màng tế bào">
+                        <div class="dest-overlay">
+                            <h3 class="vi">Cấu tạo màng tế bào</h3>
+                            <h3 class="en">Cell Membrane</h3>
+                            <p class="vi">Xem chi tiết →</p>
+                            <p class="en">View details →</p>
+                        </div>
+                    </div>
+
+                    <div class="dest-card swivel-card" style="animation-delay: 0.5s;" onclick="openDetail('regulation')">
+                        <img src="https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2025/9/30/vitamin-c-17592252601611091161222.jpg" alt="Điều hòa sinh lý">
+                        <div class="dest-overlay">
+                            <h3 class="vi">Điều hòa sinh lý và hòa tan vitamin</h3>
+                            <h3 class="en">Physiological Regulation and Vitamin Absorption</h3>
+                            <p class="vi">Xem chi tiết →</p>
+                            <p class="en">View details →</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+
+    <!-- PHÂN TỬ 2: SCROLL DỌC (TRANG 5 ĐẾN TRANG 8) -->
+    
+    <!-- ====== TRANG 5: PHÂN TÍCH THÊM ====== -->
+    <section class="vertical-page" id="page-5">
+        <div class="bg-with-overlay">
+            <img src="https://th.bing.com/th/id/OIP.t0cst_zNba-Rof1ZmYG3AQHaEL?w=319&h=180&c=7&r=0&o=7&pid=1.7&rm=3" alt="Nền mỡ dầu">
+        </div>
+
+        <h2 class="title-large vi fade-in">PHÂN BIỆT MỠ VÀ DẦU</h2>
+        <h2 class="title-large en fade-in">FATS VS OILS</h2>
+        
+        <div class="info-box fade-in delay-1">
+            <h2 class="vi">Sự khác biệt ở mức phân tử</h2>
+            <h2 class="en">Molecular differences</h2>
+            <br>
+            <p class="vi"><strong>Mỡ (Chất béo bão hòa):</strong> Thường có ở động vật. Các acid béo chỉ chứa liên kết đơn, làm cho phân tử có cấu trúc thẳng, xếp chặt vào nhau nên tồn tại ở trạng thái <strong>RẮN</strong> ở nhiệt độ phòng. (Ví dụ: mỡ lợn, bơ).</p>
+            <p class="en"><strong>Fats (Saturated fats):</strong> Usually found in animals. Fatty acids contain only single bonds, forming a straight structure that packs tightly, making them SOLID at room temperature.</p>
+            <p class="vi"><strong>Dầu (Chất béo không bão hòa):</strong> Thường có ở thực vật và cá. Các Acid béo chứa liên kết đôi, làm phân tử bị bẻ cong, không xếp chặt được, nên tồn tại ở trạng thái <strong>LỎNG</strong>. (Ví dụ: dầu ô liu).</p>
+            <p class="en"><strong>Oils (Unsaturated fats):</strong> Usually found in plants and fish. Fatty acids contain double bonds, causing bends in the structure, making them LIQUID at room temperature.</p>
+            
+            <div class="image-box" style="height: 220px; margin-top: 15px;">
+                <img src="https://images.tuyensinh247.com/picture/images_question/1660879871-xfxq.jpg" alt="So sánh phân tử chất béo bão hòa và không bão hòa">
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== TRANG 6: FAQ ====== -->
+    <section class="vertical-page" id="page-6">
+        <div class="bg-with-overlay">
+            <img src="https://images.unsplash.com/photo-1507668077129-56e32842fceb?q=80&w=1200" alt="Nền FAQ">
+        </div>
+
+        <h2 class="title-large vi fade-in">MỘT SỐ CÂU HỎI THƯỜNG GẶP</h2>
+        <h2 class="title-large en fade-in">COMMON QUESTIONS</h2>
+        <p class="vi fade-in delay-1">Những hiểu lầm thường gặp về chất béo trong cơ thể.</p>
+        <p class="en fade-in delay-1">Common misconceptions about fats in the body.</p>
+
+        <div class="faq-container">
+            <div class="faq-item fade-in delay-1">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span class="vi">1. Ăn nhiều chất béo có khiến ta bị béo phì không?</span>
+                    <span class="en">1. Does eating a lot of fat make us obese?</span>
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p class="vi">Béo phì xảy ra khi lượng Calo nạp vào nhiều hơn mức tiêu hao. Tuy nhiên, vì 1 gram Lipid chứa lượng calo gấp đôi tinh bột (Lipid: 9 calo/g, Carbohydrates: 4 calo/g), việc ăn nhiều chất béo dễ dẫn đến dư thừa năng lượng hơn.</p>
+                    <p class="en">Obesity occurs when calorie intake exceeds expenditure. However, because 1 gram of Lipid contains twice the calories of carbohydrates (Lipid: 9 calo/g, Carbohydrates: 4 calo/g), consuming excess fats leads to energy surplus faster.</p>
+                </div>
+            </div>
+            <div class="faq-item fade-in delay-2">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span class="vi">2. Cholesterol luôn là chất có hại?</span>
+                    <span class="en">2. Is cholesterol always harmful?</span>
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p class="vi">Sai. Cholesterol là một loại Steroid vô cùng quan trọng để xây dựng màng tế bào, tổng hợp vitamin D và hormone. Nó chỉ gây hại khi cơ thể tích tụ quá nhiều "Cholesterol xấu" (LDL).</p>
+                    <p class="en">False. Cholesterol is a vital steroid used to build cell membranes, synthesize vitamin D, and hormones. It only becomes harmful when "bad cholesterol" (LDL) accumulates excessively.</p>
+                </div>
+            </div>
+            <div class="faq-item fade-in delay-3">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span class="vi">3. Chất béo Trans (Trans-fat) là gì?</span>
+                    <span class="en">3. What are Trans-fats?</span>
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p class="vi">Là loại dầu thực vật lỏng được con người hydro hóa nhân tạo để biến thành dạng rắn (như bơ thực vật). Đây là loại chất béo cực kỳ độc hại cho hệ tim mạch.</p>
+                    <p class="en">They are liquid vegetable oils artificially hydrogenated into solid fats (like margarine). These fats are extremely harmful to cardiovascular health.</p>
+                </div>
+            </div>
+             <div class="faq-item fade-in delay-3">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span class="vi">4. Người giảm cân nên bỏ hoàn toàn chất béo không?</span>
+                    <span class="en">4. Should people trying to lose weight avoid fats completely?</span>
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p class="vi">Không, cắt bỏ hoàn toàn chất béo không phải là giải pháp tốt cho người giảm cân. Cơ thể cần một lượng chất béo nhất định để hấp thụ các vitamin tan trong chất béo và duy trì chức năng sinh lý.</p>
+                    <p class="en">No, completely avoiding fats is not a good solution for people trying to lose weight. The body needs a certain amount of fat to absorb fat-soluble vitamins and maintain physiological functions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== TRANG 7: FACTS ====== -->
+    <section class="vertical-page" id="page-7">
+        <div class="bg-with-overlay">
+            <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1200" alt="Nền Facts">
+        </div>
+
+        <h2 class="title-large vi fade-in">SỰ THẬT THÚ VỊ</h2>
+        <h2 class="title-large en fade-in">FUN FACTS</h2>
+
+        <div class="grid-container" style="max-width: 900px; grid-template-columns: 1fr 1fr;">
+            <div class="card fade-in delay-1">
+                <h3 class="vi">Lạc đà không trữ nước ở bướu!</h3>
+                <h3 class="en">Camels don't store water in humps!</h3>
+                <p class="vi">Bướu của lạc đà thực chất chứa đầy mỡ (lipid). Khi phân giải lượng mỡ này, cơ thể thu được năng lượng và "nước trao đổi chất" để sinh tồn trên sa mạc.</p>
+                <p class="en">A camel's hump is actually packed with fat (lipids). Metabolizing this fat provides energy and "metabolic water" for survival in the desert.</p>
+            </div>
+            <div class="card fade-in delay-2">
+                <h3 class="vi">Vitamin "kén chọn"</h3>
+                <h3 class="en">"Picky" Vitamins</h3>
+                <p class="vi">Các vitamin A, D, E, K không tan trong nước mà chỉ tan trong Lipid. Ăn salad không có dầu/sốt thì cơ thể sẽ khó hấp thụ các vitamin này.</p>
+                <p class="en">Vitamins A, D, E, and K are insoluble in water and dissolve only in lipids. Eating salad without oil/dressing makes it difficult for the body to absorb these vitamins.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== TRANG 8: CUỐI CÙNG & NÚT QUIZ ====== -->
+    <section class="vertical-page" id="page-8">
+        <div class="bg-with-overlay">
+            <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1200" alt="Ảnh nền sinh học">
+        </div>
+
+        <div style="position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <h1 class="title-huge vi fade-in">KIỂM TRA KIẾN THỨC</h1>
+            <h1 class="title-huge en fade-in">KNOWLEDGE CHECK</h1>
+            <p class="vi fade-in delay-1">Hãy cùng làm bài trắc nghiệm nhanh 6 câu để xem bạn hiểu rõ về Lipid đến mức nào nhé!</p>
+            <p class="en fade-in delay-1">Let's take a quick 6-question quiz to see how well you understand Lipids!</p>
+            
+            <br>
+            <button class="btn vi fade-in delay-2" style="padding: 15px 45px; font-size: 1.3rem;" onclick="openQuiz()">BẮT ĐẦU LÀM BÀI</button>
+            <button class="btn en fade-in delay-2" style="padding: 15px 45px; font-size: 1.3rem;" onclick="openQuiz()">START THE QUIZ</button>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         DETAIL MODAL
+         ========================================================================== -->
+    <div id="detail-overlay">
+        <div class="detail-modal-box" id="detail-modal-box">
+            <div class="close-detail" onclick="closeDetail()">✖</div>
+            <h2 id="detail-title">Tiêu đề chi tiết</h2>
+            <div class="image-box" style="height: 250px;">
+                <img id="detail-img" src="" alt="Ảnh chi tiết">
+            </div>
+            <p id="detail-text">Nội dung chi tiết sẽ hiện ở đây...</p>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         QUIZ MODAL
+         ========================================================================== -->
+    <div id="quiz-overlay">
+        <div class="bg-with-overlay">
+            <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1200" alt="Ảnh nền sinh học">
+        </div>
+
+        <div class="close-quiz" onclick="closeQuiz()">✖</div>
+        
+        <div class="quiz-container" id="quiz-question-screen">
+            <h2 class="question-text vi" id="q-text-vi"></h2>
+            <h2 class="question-text en" id="q-text-en"></h2>
+            
+            <div class="options-grid" id="options-grid"></div>
+            
+            <button class="next-arrow-btn" id="next-btn" onclick="goToNextQuestion()">➔</button>
+        </div>
+
+        <div class="quiz-container" id="quiz-result-screen">
+            <h1 class="title-huge vi">HOÀN THÀNH BÀI TẬP!</h1>
+            <h1 class="title-huge en">QUIZ COMPLETED!</h1>
+            
+            <div class="score-display">
+                <span id="score-text">0</span> / 6
+            </div>
+            
+            <p class="vi" style="color: #ddd;">Cảm ơn bạn đã tham gia bài học về Lipid. Hãy ghi nhớ vai trò cực kì quan trọng của chất béo đối với cơ thể sinh vật nhé.</p>
+            <p class="en" style="color: #ddd;">Thank you for joining the Lipids lesson. Always remember the crucial role of fats in living organisms.</p>
+            <br>
+            
+            <button class="btn vi" onclick="closeQuiz()">ĐÓNG</button>
+            <button class="btn en" onclick="closeQuiz()">CLOSE</button>
+            
+            <button class="btn vi" style="margin-left: 15px; background: #fff; color: #000;" onclick="openQuiz()">CHƠI LẠI</button>
+            <button class="btn en" style="margin-left: 15px; background: #fff; color: #000;" onclick="openQuiz()">REPLAY</button>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         JAVASCRIPT LOGIC
+         ========================================================================== -->
+    <script>
+        let currentLang = 'vi';
+        function switchLanguage(lang) {
+            currentLang = lang;
+            const body = document.body;
+            if(lang === 'en') {
+                body.classList.add('lang-en'); body.classList.remove('lang-vi');
+                document.getElementById('btn-en').classList.add('active'); document.getElementById('btn-vi').classList.remove('active');
+            } else {
+                body.classList.add('lang-vi'); body.classList.remove('lang-en');
+                document.getElementById('btn-vi').classList.add('active'); document.getElementById('btn-en').classList.remove('active');
+            }
+            if(document.getElementById('quiz-overlay').style.display === 'flex' && !isAnswerRevealed) {
+                renderQuizQuestion();
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            const wrapper = document.getElementById('horizontal-wrapper');
+            const container = document.getElementById('horizontal-container');
+            const wrapperRect = wrapper.getBoundingClientRect();
+            
+            if (wrapperRect.top <= 0 && wrapperRect.bottom >= window.innerHeight) {
+                const scrolledVh = Math.abs(wrapperRect.top) / window.innerHeight;
+                container.style.transform = `translateX(-${scrolledVh * 100}vw)`;
+            } else if (wrapperRect.bottom < window.innerHeight) {
+                container.style.transform = `translateX(-400vw)`;
+            } else {
+                container.style.transform = `translateX(0)`;
+            }
+        });
+
+        const observerOptions = { threshold: 0.15 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    if(entry.target.classList.contains('swivel-card')) {
+                        entry.target.classList.add('swivel-active');
+                    }
+                } else {
+                    entry.target.classList.remove('visible');
+                    if(entry.target.classList.contains('swivel-card')) {
+                        entry.target.classList.remove('swivel-active');
+                    }
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        document.querySelectorAll('.swivel-card').forEach(el => observer.observe(el));
+
+        let currentPageIndex = 0;
+        const totalPages = 9;
+        let isNavigating = false;
+        
+        function calculatePagePositions() {
+            const positions = [];
+            const wrapperTop = document.getElementById('horizontal-wrapper').offsetTop;
+            
+            for(let i = 0; i < 5; i++) {
+                positions.push(wrapperTop + (i * window.innerHeight));
+            }
+            positions.push(document.getElementById('page-5').offsetTop);
+            positions.push(document.getElementById('page-6').offsetTop);
+            positions.push(document.getElementById('page-7').offsetTop);
+            positions.push(document.getElementById('page-8').offsetTop);
+            return positions;
+        }
+
+        function updateArrows() {
+            document.getElementById('prev-page-btn').style.display = currentPageIndex === 0 ? 'none' : 'flex';
+            document.getElementById('next-page-btn').style.display = currentPageIndex === totalPages - 1 ? 'none' : 'flex';
+        }
+
+        function goToSection(index) {
+            if(isNavigating) return;
+            isNavigating = true;
+
+            const positions = calculatePagePositions();
+            currentPageIndex = index;
+            if(currentPageIndex < 0) currentPageIndex = 0;
+            if(currentPageIndex >= totalPages) currentPageIndex = totalPages - 1;
+
+            window.scrollTo({
+                top: positions[currentPageIndex],
+                behavior: 'smooth'
+            });
+
+            updateArrows();
+            setTimeout(() => {
+                isNavigating = false;
+            }, 1000);
+        }
+
+        function navigatePage(direction) {
+            goToSection(currentPageIndex + direction);
+        }
+
+        window.addEventListener('scroll', () => {
+            if(isNavigating) return; 
+            
+            const positions = calculatePagePositions();
+            const currentScroll = window.scrollY;
+            
+            let newIndex = 0;
+            for(let i = 0; i < positions.length; i++) {
+                if (currentScroll >= positions[i] - (window.innerHeight / 2)) {
+                    newIndex = i;
+                }
+            }
+            if (currentPageIndex !== newIndex) {
+                currentPageIndex = newIndex;
+                updateArrows();
+            }
+        });
+        
+        updateArrows();
+
+        // CƠ SỞ DỮ LIỆU CHI TIẾT SONG NGỮ CHO MODAL
+        const detailDatabase = {
+            'fats': {
+                img: 'https://tse4.mm.bing.net/th/id/OIP.TU_r9-cfJs9NCoo4HQG8qgHaEK?r=0&w=680&h=383&rs=1&pid=ImgDetMain&o=7&rm=3',
+                vi: {
+                    title: 'Mỡ và Dầu (Triglyceride)',
+                    text: 'Triglyceride cấu tạo gồm 1 phân tử glycerol liên kết với 3 phân tử Acid béo.\n- Mỡ: Chứa Acid béo bão hòa, thường ở thể rắn ở nhiệt độ phòng.\n- Dầu: Chứa Acid béo chưa bão hòa, mạch carbon uốn khúc nên ở thể lỏng.'
+                },
+                en: {
+                    title: 'Fats and Oils (Triglycerides)',
+                    text: 'Triglycerides consist of 1 glycerol molecule bonded to 3 fatty acid molecules.\n- Fats: Contain saturated fatty acids, usually solid at room temperature.\n- Oils: Contain unsaturated fatty acids with bent carbon chains, liquid at room temperature.'
+                }
+            },
+            'phospholipid': {
+                img: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Phospholipid_TvanBrussel.edit.jpg',
+                vi: {
+                    title: 'Phospholipid',
+                    text: 'Là dẫn xuất chứa nhóm Phosphate (PO₄³⁻). Cấu tạo gồm 1 phân tử glycerol liên kết với 2 acid béo và 1 nhóm phosphate.\n\nĐầu ưa nước kết hợp đuôi kị nước tạo nên cấu trúc màng sinh chất vững chắc.'
+                },
+                en: {
+                    title: 'Phospholipids',
+                    text: 'Derivatives containing a Phosphate group (PO₄³⁻). Composed of 1 glycerol molecule bonded to 2 fatty acids and 1 phosphate group.\n\nThe hydrophilic head combined with the hydrophobic tail creates a stable cell membrane structure.'
+                }
+            },
+            'steroid': {
+                img: 'https://trungtamthuoc.com/images/item/qua-trinh-sinh-tong-hop-chuyen-hoa-hormone-sinh-duc-nam-va-nu-2.jpg',
+                vi: {
+                    title: 'Steroid',
+                    text: '- Steroid: Cấu trúc 4 vòng carbon liên kết chặt chẽ và không chứa phân tử acid béo (tiêu biểu như cholesterol, testosterone).'
+                },
+                en: {
+                    title: 'Steroids',
+                    text: '- Steroids: Structure consists of 4 tightly fused carbon rings and does not contain fatty acid molecules (typically including cholesterol and testosterone).'
+                }
+            },
+            'carotenoid': {
+                img: 'https://tse4.mm.bing.net/th/id/OIP.wCtcrX3yG3nnosVtKiEypQHaFR?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
+                vi: {
+                    title: 'Carotenoid',
+                    text: '- Là nhóm sắc tố tự nhiên (màu vàng cam) có chứa liên kết đôi conjugated, tìm thấy trong thực vật và một số vi sinh vật.\nCon người và động vật khi ăn các loại rau củ chứa carotenoid có thể chuyển đổi chúng thành vitamin A.'
+                },
+                en: {
+                    title: 'Carotenoids',
+                    text: '- Natural pigments (yellow-orange) containing conjugated double bonds, found in plants and some microorganisms.\nHumans and animals can convert dietary carotenoids into vitamin A.'
+                }
+            },
+            'energy': {
+                img: 'https://toplist.vn/images/800px/gioi-thieu-ve-gau-trang-bac-cuc-873268.jpg',
+                vi: {
+                    title: '1. Dự trữ và cung cấp năng lượng',
+                    text: 'Lipid (mỡ và dầu) là nguồn dự trữ năng lượng dài hạn cực kỳ quan trọng của cơ thể.\n\nNgoài ra, lớp mỡ dưới da còn hoạt động như một lớp cách nhiệt giúp giữ ấm cơ thể và là đệm cơ học bảo vệ các cơ quan nội tạng.'
+                },
+                en: {
+                    title: '1. Energy Storage and Supply',
+                    text: 'Lipids (fats and oils) serve as a crucial long-term energy storage source for the body.\n\nAdditionally, subcutaneous fat acts as a thermal insulation layer to keep the body warm and provides mechanical cushioning to protect internal organs.'
+                }
+            },
+            'membrane': {
+                img: 'https://th.bing.com/th/id/R.018c0f07730e97659c3a31cf36396b33?rik=cxYIReSHHvizRg&pid=ImgRaw&r=0',
+                vi: {
+                    title: '2. Cấu tạo màng tế bào 🧱',
+                    text: 'Phospholipid và Cholesterol là các thành phần cốt lõi cấu tạo nên mọi màng sinh chất của tế bào sống.\n\nPhân tử phospholipid có cấu trúc lưỡng cực (đầu ưa nước hướng ra ngoài, đuôi kị nước quay vào trong) tạo thành lớp kép vững chắc nhưng linh hoạt.'
+                },
+                en: {
+                    title: '2. Cell Membrane Structure 🧱',
+                    text: 'Phospholipids and cholesterol are core components forming all plasma membranes of living cells.\n\nPhospholipid molecules have a bipolar structure (hydrophilic heads facing outward, hydrophobic tails facing inward) forming a rigid yet flexible bilayer.'
+                }
+            },
+            'regulation': {
+                img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=800',
+                vi: {
+                    title: '3. Điều hòa sinh lý & Hòa tan vitamin 🧬',
+                    text: 'Nhiều loại hormone quan trọng như hormone sinh dục có bản chất là steroid (lipid).\n\nBên cạnh đó, lipid đóng vai trò là dung môi bắt buộc để cơ thể hấp thu các vitamin hòa tan trong chất béo bao gồm Vitamin A, D, E và K.'
+                },
+                en: {
+                    title: '3. Physiological Regulation & Vitamin Absorption 🧬',
+                    text: 'Many important hormones, such as sex hormones, are steroid lipids in nature.\n\nBesides, lipids act as essential solvents for the body to absorb fat-soluble vitamins including Vitamins A, D, E, and K.'
+                }
+            }
+        };
+
+        function openDetail(key) {
+            const item = detailDatabase[key];
+            if(!item) return;
+
+            const overlay = document.getElementById('detail-overlay');
+            const modalBox = document.getElementById('detail-modal-box');
+            
+            const content = item[currentLang] || item['vi'];
+
+            document.getElementById('detail-title').innerText = content.title;
+            document.getElementById('detail-text').innerText = content.text;
+            document.getElementById('detail-img').src = item.img;
+            
+            overlay.style.display = 'flex';
+            modalBox.classList.remove('detail-fade-down');
+            modalBox.classList.add('detail-fade-up');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetail() {
+            const overlay = document.getElementById('detail-overlay');
+            const modalBox = document.getElementById('detail-modal-box');
+            
+            modalBox.classList.remove('detail-fade-up');
+            modalBox.classList.add('detail-fade-down');
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                modalBox.classList.remove('detail-fade-down');
+                document.body.style.overflow = 'auto';
+            }, 250);
+        }
+
+        document.getElementById('detail-overlay').addEventListener('click', (e) => {
+            if(e.target === document.getElementById('detail-overlay')) {
+                closeDetail();
+            }
+        });
+
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            if (answer.style.maxHeight) {
+                answer.style.maxHeight = null;
+            } else {
+                document.querySelectorAll('.faq-answer').forEach(ans => ans.style.maxHeight = null);
+                answer.style.maxHeight = answer.scrollHeight + "px";
+            }
+        }
+
+        const quizDatabase = [
+            {
+                q_vi: "1. Đặc tính vật lý cơ bản nhất của mọi loại Lipid là gì?",
+                q_en: "1. What is the most basic physical characteristic of all Lipids?",
+                options_vi: ["Kị nước (Không tan trong nước)", "Tan tốt trong nước nóng", "Tan trong mọi dung môi", "Có vị ngọt"],
+                options_en: ["Hydrophobic (Insoluble in water)", "Highly soluble in hot water", "Soluble in all solvents", "Sweet taste"],
+                correctIndex: 0
+            },
+            {
+                q_vi: "2. Loại lipid nào là thành phần chính cấu tạo nên màng sinh chất của tế bào?",
+                q_en: "2. Which type of lipid is the main component of cell membranes?",
+                options_vi: ["Triglyceride (Mỡ và dầu)", "Phospholipid", "Sáp", "Vitamin A, D"],
+                options_en: ["Triglycerides (Fats and oils)", "Phospholipids", "Waxes", "Vitamin A, D"],
+                correctIndex: 1
+            },
+            {
+                q_vi: "3. Cấu tạo cơ bản của 1 phân tử Mỡ (Triglyceride) gồm những gì?",
+                q_en: "3. What is the basic structure of a Fat molecule (Triglyceride)?",
+                options_vi: ["1 Glycerol liên kết 2 Acid béo", "2 Glycerol liên kết 3 Acid béo", "1 Glycerol liên kết 3 Acid béo", "Nhiều Axit amin liên kết nhau"],
+                options_en: ["1 Glycerol bonded to 2 Fatty acids", "2 Glycerols bonded to 3 Fatty acids", "1 Glycerol bonded to 3 Fatty acids", "Multiple Amino acids bonded together"],
+                correctIndex: 2
+            },
+            {
+                q_vi: "4. Dầu thực vật thường ở trạng thái lỏng ở nhiệt độ phòng vì lí do gì?",
+                q_en: "4. Why are vegetable oils usually liquid at room temperature?",
+                options_vi: ["Vì chúng chứa nhiều nước", "Do cấu tạo từ các Acid béo chưa bão hòa (bị bẻ cong)", "Do cấu tạo từ Acid béo bão hòa (thẳng hàng)", "Vì chúng không có glycerol"],
+                options_en: ["Because they contain lots of water", "Due to unsaturated fatty acids (bent structure)", "Due to saturated fatty acids (straight structure)", "Because they lack glycerol"],
+                correctIndex: 1
+            },
+            {
+                q_vi: "5. Hormone sinh dục (như Testosterone, Estrogen) thuộc nhóm lipid nào?",
+                q_en: "5. Sex hormones (like Testosterone, Estrogen) belong to which lipid group?",
+                options_vi: ["Steroid", "Phospholipid", "Sáp", "Mỡ động vật"],
+                options_en: ["Steroids", "Phospholipids", "Waxes", "Animal fats"],
+                correctIndex: 0
+            },
+            {
+                q_vi: "6. Vai trò nào sau đây KHÔNG PHẢI là chức năng của lipid?",
+                q_en: "6. Which of the following is NOT a function of lipids?",
+                options_vi: ["Dự trữ năng lượng", "Xúc tác các phản ứng sinh hóa (Enzyme)", "Cấu tạo tế bào", "Cách nhiệt cho cơ thể"],
+                options_en: ["Energy storage", "Catalyzing biochemical reactions (Enzyme)", "Cell structure", "Thermal insulation"],
+                correctIndex: 1
+            }
+        ];
+
+        let currentQuestionIndex = 0, score = 0, isAnswerRevealed = false;
+
+        function openQuiz() {
+            document.getElementById('quiz-overlay').style.display = 'flex';
+            document.getElementById('quiz-question-screen').style.display = 'block';
+            document.getElementById('quiz-result-screen').style.display = 'none';
+            document.body.style.overflow = 'hidden';
+            currentQuestionIndex = 0; score = 0; renderQuizQuestion();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quiz-overlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function renderQuizQuestion() {
+            isAnswerRevealed = false;
+            document.getElementById('next-btn').style.display = 'none';
+            
+            const currentData = quizDatabase[currentQuestionIndex];
+            document.getElementById('q-text-vi').innerText = currentData.q_vi;
+            document.getElementById('q-text-en').innerText = currentData.q_en;
+
+            const gridElement = document.getElementById('options-grid');
+            gridElement.innerHTML = ''; 
+            const optionsToRender = currentLang === 'en' ? currentData.options_en : currentData.options_vi;
+
+            optionsToRender.forEach((text, index) => {
+                const optBtn = document.createElement('div');
+                optBtn.className = 'option-item';
+                optBtn.innerText = text;
+                optBtn.onclick = () => handleAnswerSelect(index, optBtn);
+                gridElement.appendChild(optBtn);
+            });
+        }
+
+        function handleAnswerSelect(selectedIndex, clickedElement) {
+            if (isAnswerRevealed) return;
+            isAnswerRevealed = true;
+
+            const correctIndex = quizDatabase[currentQuestionIndex].correctIndex;
+            const allOptionElements = document.querySelectorAll('.option-item');
+
+            if (selectedIndex === correctIndex) {
+                score++;
+                allOptionElements.forEach((el, idx) => {
+                    if (idx === correctIndex) el.classList.add('correct-zoom');
+                    else el.classList.add('hidden');
+                });
+            } else {
+                allOptionElements.forEach((el, idx) => {
+                    if (idx === selectedIndex) el.classList.add('wrong-static');
+                    else if (idx === correctIndex) el.classList.add('correct-static');
+                    else el.classList.add('hidden');
+                });
+            }
+
+            setTimeout(() => { document.getElementById('next-btn').style.display = 'inline-block'; }, 800);
+        }
+
+        function goToNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizDatabase.length) renderQuizQuestion();
+            else showQuizResult();
+        }
+
+        function showQuizResult() {
+            document.getElementById('quiz-question-screen').style.display = 'none';
+            document.getElementById('quiz-result-screen').style.display = 'block';
+            document.getElementById('score-text').innerText = score;
+        }
+    </script>
+</body>
+</html>
